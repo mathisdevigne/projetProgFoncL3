@@ -47,11 +47,10 @@ let getFunBiOp (c:char) : (int->int->int) =
 (*  Question 1  *)
 
 (* Fonction qui parse une liste de string pour en faire un arbre. Les arites sont les arbres deja creer sur lesquels on fera les operations. *)
-let rec parse_aux (arity : tree list) (l : string list) : tree =
+let rec parse ?(arity : tree list = []) (l : string list) : tree =
   match l with
   |[] -> failwith("Liste vide")
-
-  (* Un redefini notre liste d'arites en fonction de l'operateur :
+  (* On redefini notre liste d'arites en fonction de l'operateur :
      - une operation : on prend les arites en fonctions de l'operation pour creer un arbre qu'on rajoutera a la liste
      - une variable ou un constante : on rajoute une feuille contenant l'operateur *)
   |h::t -> let newArity = (
@@ -64,12 +63,10 @@ let rec parse_aux (arity : tree list) (l : string list) : tree =
     ) in
     (* Si c'est le dernier element de la liste à analyser, on renvoie la tete des arites, sinon on rappelle la fonction sur le reste de la liste *)
     if (t = []) then List.hd newArity
-    else parse_aux newArity t
+    else parse ~arity:newArity t
 ;;
 
 
-
-let parse = parse_aux [];;
 
 let tr = parse ["13";"2";"5";"*";"1";"0";"/";"-";"+"];;
 let trfail = parse ["13";"2";"5";"+";"*";"1";"0";"/";"-";"+"];;
