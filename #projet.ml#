@@ -1,0 +1,141 @@
+open Str;;
+
+
+(*  Def  *)
+type op = Var of char | Const of int | Op of char;;
+
+type tree = Leaf of op | BiOp of (op * tree * tree) | MonoOp of (op * tree);;
+
+
+
+(*  Utils  *)
+let isStringFun f = String.fold_left f true;; 
+
+let isInt = isStringFun (fun acc v -> v >= '0'  && v <= '9' && acc);;
+
+let isMinusChar = isStringFun (fun acc v -> v >= 'a'  && v <= 'z' && acc);;
+
+let isOp (s : string) : bool = List.mem s ["*";"-";"+";"/";"~"];;
+
+let getOp (s : string) : op =
+  if (List.mem s ["*";"-";"+";"/";"~"])
+  then Op(s.[0])
+  else if (isInt s)
+  then Const(int_of_string s)
+  else if (isMinusChar s && (String.length s) == 1)
+  then Var(s.[0])
+  else failwith("Pas une operation")
+;;
+
+let getFunBiOp c =
+  match c with
+  |'*' -> ( * )
+  |'-' -> ( - )
+  |'+' -> ( + )
+  |'/' -> ( / )
+  |_ -> failwith("Not an biop")
+;;
+
+
+
+let printOp (o : op) =
+  match o with
+  |Var(c) -> Printf.sprintf "%c" c
+  |Const(i) -> string_of_int i
+  |Op(c) -> Printf.sprintf "%c" c
+;;
+
+
+(*  Question 1  *)
+
+let rec parse_aux (arity : tree list) (l : string list) : tree =
+  match l with
+  |[] -> failwith("Liste vide")
+  |h::[] ->(
+    match getOp h with
+    |Op('~') -> MonoOp(Op('~'), List.hd arity)
+    |Op(c) ->  BiOp(Op(c), List.hd (List.tl arity), List.hd arity)
+    |_ -> Leaf(getOp h)
+  )
+  |h::t ->
+    match getOp h with
+    |Op('~') -> parse_aux (MonoOp(Op('~'), List.hd arity)::(List.tl arity)) t
+    |Op(c) -> parse_aux (BiOp(Op(c), List.hd(List.tl arity), List.hd arity)::(List.tl(List.tl arity))) t
+    |_ -> parse_aux (Leaf(getOp h)::arity) t
+;;
+
+
+let parse = parse_aux [];;
+
+
+let tr = parse ["13";"2";"5";"*";"1";"0";"/";"-";"+"];;
+
+
+
+(*  Question 2  *)
+
+
+let rec simplify (t:tree) : tree =
+  match t with
+  |Leaf(o) -> t
+  |MonoOp(o, son) -> (
+      let simpSon = simplify son in
+      match simpSon with
+      |Leaf(Const(i)) -> Leaf(Const(-i))
+      |_ -> MonoOp(o, simpSon)
+    )
+  |BiOp(Op(c), g, d) -> (
+      let (simpG, simpD) = (simplify g, simplify d) in
+      match (c, simpG, simpD) with
+      |('-', Leaf(Var(c)), Leaf(Const(0)))
+      |('+', Leaf(Var(c)), Leaf(Const(0)))
+      |('+', Leaf(Const(0)), Leaf(Var(c)))
+      |('*', Leaf(Var(c)), Leaf(Const(1)))
+      |('*', Leaf(Const(1)), Leaf(Var(c)))
+      |('/', Leaf(Var(c)), Leaf(Const(1))) -> Leaf(Var(c))
+
+      |('*', Leaf(Var(c)), Leaf(Const(-1)))
+      |('*', Leaf(Const(-1)), Leaf(Var(c)))
+      |('-', Leaf(Const(0)), Leaf(Var(c))) -> (MonoOp(Op('~'), Leaf(Var(c)))
+
+      |('/', Leaf(Const(0)), _)
+      |('*', _, Leaf(Const(0)))
+      |('*', Leaf(Const(0)), _) -> Leaf(Const(0))
+                    
+      |(_, Leaf(Const(ig)), Leaf(Const(id))) -> Leaf(Const((getFunBiOp c) ig id))
+
+      
+      |('/', _, Leaf(Const(0))) -> failwith("Division par zero !!!")
+                                                
+      |_ -> if(simpG = simpD && c = '-') then Leaf(Const(0))
+            else if(simpG = simpD && c = '/') then Leaf(Const(1))
+            else BiOp(Op(c), simpG, simpD)
+    )
+  |_ -> failwith("Tree not simplifiable")
+;;
+
+let simpTr = simplify (parse ["x"; "x";"/"]);;
+
+
+
+(*  Question 3  *)
+
+
+let rec print (t : tree) =
+  match t with
+  |Leaf(o) -> printOp o
+  |MonoOp(o, t) -> (printOp o) ^ (print_aux t)
+  |BiOp(Op('+'), t1, t2) -> (print_aux t1) ^ "+"  ^ (print t2)
+  |BiOp(o, t1, t2) -> (print_aux t1) ^ (printOp o) ^ (print_aux t2)
+;;
+let rec print_aux (t : tree) =
+  match t with
+  |Leaf(o) -> printOp o
+  |MonoOp(o, t) -> (printOp o) ^ (print_aux t)
+  |BiOp(Op('/'), t1, t2) -> (print_aux t1) ^ "/"  ^ (print_aux t2)
+  |BiOp(Op('*'), t1, t2) -> (print_aux t1) ^ "*"  ^ (print_aux t2)
+  |BiOp(Op('+'), t1, t2) -> "(" ^ (print_aux t1) ^ "+"  ^ (print t2) ^ ")"
+  |BiOp(o, t1, t2) -> "(" ^ (print_aux t1) ^ (printOp o) ^ (print_aux t2) ^ ")"
+;;
+
+print (parse ["a";"b";"*";"c";"*";"e";"f";"+";"*"]);;
