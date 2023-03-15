@@ -1,3 +1,0 @@
-type op = Var of char | Const of int | Op of char;;
-
-type tree = Leaf of op | Node of (Op * op * op);;  
