@@ -119,7 +119,19 @@ let rec simplify (t:tree) : tree =
 let printOp (o : op) =
   match o with
   |Const(i) -> string_of_int i
-  |_ -> Printf.sprintf "%c" c
+  |Var(c)
+  |Op(c) -> Printf.sprintf "%c" c
+;;
+
+(* fonction print sans les parentheses, pour les autres cas. Les parenthèses sont en fonction de l'operateur courant et de celuis d'avant. Ces fonctions sont fusionable mais la solution que j'ai trouvé été bien trop compliqué *)
+let rec print_aux (t : tree) =
+  match t with
+  |Leaf(o) -> printOp o
+  |MonoOp(o, t) -> (printOp o) ^ (print_aux t)
+  |BiOp(Op('*'), t1, t2) -> (print_aux t1) ^ "*"  ^ (print_aux t2)
+  |BiOp(Op('/'), t1, t2) -> (print_aux t1) ^ "/"  ^ (print_aux t2)
+  |BiOp(Op('+'), t1, t2) -> "(" ^ (print_aux t1) ^ "+"  ^ (print_aux t2) ^ ")"
+  |BiOp(o, t1, t2) -> "(" ^ (print_aux t1) ^ (printOp o) ^ (print_aux t2) ^ ")"
 ;;
 
 (* fonction print sans les parentheses, cas du debut d'un print ou d'après un plus*)
@@ -129,18 +141,6 @@ let rec print (t : tree) =
   |MonoOp(o, t) -> (printOp o) ^ (print_aux t)
   |BiOp(Op('+'), t1, t2) -> (print_aux t1) ^ "+"  ^ (print t2)
   |BiOp(o, t1, t2) -> (print_aux t1) ^ (printOp o) ^ (print_aux t2)
-;;
-
-
-(* fonction print sans les parentheses, pour les autres cas. Les parenthèses sont en fonction de l'operateur courant et de celuis d'avant. Ces fonctions sont fusionable mais la solution que j'ai trouvé été bien trop compliqué *)
-let rec print_aux (t : tree) =
-  match t with
-  |Leaf(o) -> printOp o
-  |MonoOp(o, t) -> (printOp o) ^ (print_aux t)
-  |BiOp(Op('*'), t1, t2) -> (print_aux t1) ^ "*"  ^ (print_aux t2)
-  |BiOp(Op('/'), t1, t2) -> (print_aux t1) ^ "/"  ^ (print_aux t2)
-  |BiOp(Op('+'), t1, t2) -> "(" ^ (print_aux t1) ^ "+"  ^ (print t2) ^ ")"
-  |BiOp(o, t1, t2) -> "(" ^ (print_aux t1) ^ (printOp o) ^ (print_aux t2) ^ ")"
 ;;
 
 
