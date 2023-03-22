@@ -69,7 +69,7 @@ let rec parse ?(arity : tree list = []) (l : string list) : tree =
 
 
 let tr = parse ["13";"2";"5";"*";"1";"0";"/";"-";"+"];;
-let trfail = parse ["13";"2";"5";"+";"*";"1";"0";"/";"-";"+"];;
+(*let trfail = parse ["13";"2";"5";"+";"*";"1";"0";"/";"-";"+"];;*)
 
 
 
@@ -91,7 +91,7 @@ let rec simplify (t:tree) : tree =
       match (c, simpG, simpD) with
       |('-', Leaf(Var(c)), Leaf(Const(0))) (* x-0 *)
       |('+', Leaf(Var(c)), Leaf(Const(0))) (* x+0 *)
-      |('+', Leaf(Const(0)), Leaf(Var(c))) 
+      |('+', Leaf(Const(0)), Leaf(Var(c)))
       |('*', Leaf(Var(c)), Leaf(Const(1))) (* x*1 *)
       |('*', Leaf(Const(1)), Leaf(Var(c)))
       |('/', Leaf(Var(c)), Leaf(Const(1))) (* x/1 *) -> Leaf(Var(c))  (* =x *)
@@ -103,20 +103,15 @@ let rec simplify (t:tree) : tree =
       |('/', Leaf(Const(0)), _) (* x/_ *)
       |('*', _, Leaf(Const(0))) (* _*0 *)
       |('*', Leaf(Const(0)), _) -> Leaf(Const(0)) (* =0 *)
-                    
       |(_, Leaf(Const(ig)), Leaf(Const(id))) -> Leaf(Const((getFunBiOp c) ig id)) (* Calcul constantes *)
-      
+
       |('/', _, Leaf(Const(0))) -> failwith("Division par zero !!!")
-                                                
       |_ -> if(simpG = simpD && c = '-') then Leaf(Const(0)) (* _-_ = 0 *)
             else if(simpG = simpD && c = '/') then Leaf(Const(1)) (* _/_ = 1 *)
             else BiOp(Op(c), simpG, simpD)
     )
   |_ -> failwith("Arbre non simplifiable")
 ;;
-
-let simpTr = simplify (parse ["x"; "x";"/"]);;
-
 
 
 (*  Question 3  *)
