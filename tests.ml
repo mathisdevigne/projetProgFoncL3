@@ -119,9 +119,8 @@ let launch() : unit =
     print_endline("---------------");
     print_endline("Test simplify :");
     print_endline("---------------");
-    printTest ("simplify") (testSimplify (parse ["x"; "x";"/"]) (Leaf (Const 1)) );
-    printTest ("simplify") (testSimplify (parse ["x"; "4"; "x";"/"]) (BiOp (Op '/', Leaf (Const 4), Leaf (Var 'x'))) );
-    (* Il faut un test pour le MonoOp *)
+    printTest ("simplify MonoOp") (testSimplify (parse ["x"; "2";"5";"*";"+";"~"]) (MonoOp (Op '~', BiOp (Op '+', Leaf (Var 'x'), Leaf (Const 10)))));
+    printTest ("simplify Leaf") (testSimplify (parse ["13"; "2";"5";"*";"+"]) (Leaf (Const 23)));
 
     (* ============= *)
   )

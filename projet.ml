@@ -67,12 +67,6 @@ let rec parse ?(arity : tree list = []) (l : string list) : tree =
 ;;
 
 
-
-let tr = parse ["13";"2";"5";"*";"1";"0";"/";"-";"+"];;
-(*let trfail = parse ["13";"2";"5";"+";"*";"1";"0";"/";"-";"+"];;*)
-
-
-
 (*  Question 2  *)
 
 
