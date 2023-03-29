@@ -117,14 +117,14 @@ let printOp (o : op) =
   |Op(c) -> Printf.sprintf "%c" c
 ;;
 
-(* fonction print sans les parentheses, pour les autres cas. Les parenthèses sont en fonction de l'operateur courant et de celuis d'avant. Ces fonctions sont fusionable mais la solution que j'ai trouvé été bien trop compliqué *)
+(* fonction print avec les parentheses pour les autres cas le nécessitant. Les parenthèses sont en fonction de l'operateur courant et de celuis d'avant. Ces fonctions sont fusionable mais la solution que j'ai trouvé été bien trop compliqué *)
 let rec print_aux (t : tree) =
   match t with
   |Leaf(o) -> printOp o
   |MonoOp(o, t) -> (printOp o) ^ (print_aux t)
   |BiOp(Op('*'), t1, t2) -> (print_aux t1) ^ "*"  ^ (print_aux t2)
   |BiOp(Op('/'), t1, t2) -> (print_aux t1) ^ "/"  ^ (print_aux t2)
-  |BiOp(Op('+'), t1, t2) -> "(" ^ (print_aux t1) ^ "+"  ^ (print_aux t2) ^ ")"
+  |BiOp(Op('+'), t1, t2) -> "(" ^ (print_aux t1) ^ "+"  ^ (print t2) ^ ")"
   |BiOp(o, t1, t2) -> "(" ^ (print_aux t1) ^ (printOp o) ^ (print_aux t2) ^ ")"
 ;;
 
