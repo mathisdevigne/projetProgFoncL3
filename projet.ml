@@ -136,8 +136,3 @@ let rec print (t : tree) =
   |BiOp(Op('+'), t1, t2) -> (print_aux t1) ^ "+"  ^ (print t2)
   |BiOp(o, t1, t2) -> (print_aux t1) ^ (printOp o) ^ (print_aux t2)
 ;;
-
-
-
-print (parse ["a";"b";"*";"c";"*";"e";"f";"+";"*"]);;
-print (parse ["a";"b";"c";"*";"+"]);;
