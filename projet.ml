@@ -124,7 +124,7 @@ let rec print_aux (t : tree) =
   |MonoOp(o, t) -> (printOp o) ^ (print_aux t)
   |BiOp(Op('*'), t1, t2) -> (print_aux t1) ^ "*"  ^ (print_aux t2)
   |BiOp(Op('/'), t1, t2) -> (print_aux t1) ^ "/"  ^ (print_aux t2)
-  |BiOp(Op('+'), t1, t2) -> "(" ^ (print_aux t1) ^ "+"  ^ (print t2) ^ ")"
+  |BiOp(Op('+'), t1, t2) -> "(" ^ (print_aux t1) ^ "+"  ^ (print_aux t2) ^ ")"
   |BiOp(o, t1, t2) -> "(" ^ (print_aux t1) ^ (printOp o) ^ (print_aux t2) ^ ")"
 ;;
 
@@ -133,6 +133,6 @@ let rec print (t : tree) =
   match t with
   |Leaf(o) -> printOp o
   |MonoOp(o, t) -> (printOp o) ^ (print_aux t)
-  |BiOp(Op('+'), t1, t2) -> (print_aux t1) ^ "+"  ^ (print t2)
+  |BiOp(Op('+'), t1, t2) -> (print_aux t1) ^ "+"  ^ (print_aux t2)
   |BiOp(o, t1, t2) -> (print_aux t1) ^ (printOp o) ^ (print_aux t2)
 ;;
